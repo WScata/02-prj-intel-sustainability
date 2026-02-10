@@ -208,6 +208,43 @@
     const cards = document.querySelectorAll('.timeline-card');
     
     // Add click/tap event listener to each card
+
+  // Desktop: convert vertical wheel scrolling into horizontal scroll when hovering timeline
+  (function() {
+    const timeline = document.querySelector('.timeline-container');
+    if (!timeline) return;
+
+    const desktopQuery = window.matchMedia('(min-width: 769px)');
+
+    // Use non-passive listener so we can prevent default scrolling
+    timeline.addEventListener('wheel', function(e) {
+      if (!desktopQuery.matches) return; // only on desktop
+
+      // Prefer vertical delta for typical mouse wheels
+      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+      if (!delta) return;
+
+      // Prevent the page from scrolling vertically while interacting
+      e.preventDefault();
+
+      // Scale horizontal movement with the input speed so faster
+      // wheel movement produces proportionally faster timeline scroll.
+      // multiplier grows with delta magnitude but is clamped for control.
+      const magnitude = Math.abs(delta);
+      const sign = Math.sign(delta);
+
+      // Compute a speed factor that increases with input magnitude.
+      // Tweak these constants to change sensitivity curve.
+      const factor = 1 + Math.min(6, magnitude / 40); // 40 -> +1, 240 -> +6
+
+      // Optional gentle exponential boost for very fast flicks
+      const boost = 1 + Math.log1p(magnitude) / 10;
+
+      const adjusted = sign * magnitude * factor * boost * 0.9;
+
+      timeline.scrollLeft += adjusted;
+    }, { passive: false });
+  })();
     cards.forEach(card => {
       card.addEventListener('click', function() {
         // Check if this card is already active
