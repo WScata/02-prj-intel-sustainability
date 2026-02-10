@@ -76,6 +76,8 @@ body {
   margin: 0 auto;
   /* Smooth scrolling */
   scroll-behavior: smooth;
+  /* Allow smooth vertical shift when timeline is pushed up to avoid footer */
+  transition: transform 0.28s ease, scroll-behavior 0.2s;
   /* Hide scrollbar but keep it functional */
   scrollbar-width: thin;
   scrollbar-color: #0071c5 #f0f0f0;
@@ -278,4 +280,28 @@ body {
 
 .timeline-footer p {
   margin: 0;
+}
+
+/* Desktop: keep footer visible and prevent it being pushed offscreen
+   when card descriptions expand. Make footer fixed and add bottom
+   padding to the page so content is not hidden behind it. */
+@media (min-width: 769px) {
+  body {
+    padding-bottom: 90px; /* space for fixed footer */
+  }
+
+  .timeline-footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
+    background-color: #ffffff; /* keep footer visually separate */
+  }
+  /* Ensure timeline has extra bottom space so expanded card descriptions
+     don't get clipped by the fixed footer. Adjust as needed. */
+  .timeline-container {
+    padding-bottom: 160px;
+  }
 }

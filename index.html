@@ -245,6 +245,59 @@
       timeline.scrollLeft += adjusted;
     }, { passive: false });
   })();
+
+  // Desktop: when a card would be clipped by the fixed footer, push the
+  // entire timeline up so the card's expanded description remains readable.
+  (function() {
+    const timeline = document.querySelector('.timeline-container');
+    const footer = document.querySelector('.timeline-footer');
+    if (!timeline || !footer) return;
+
+    const desktopQuery = window.matchMedia('(min-width: 769px)');
+
+    let shiftTimeout = null;
+
+    function clearShift() {
+      timeline.style.transform = '';
+    }
+
+    function maybeShiftForCard(card) {
+      if (!desktopQuery.matches) return;
+      // small delay to allow CSS hover expansion to take effect
+      clearTimeout(shiftTimeout);
+      shiftTimeout = setTimeout(() => {
+        const cardRect = card.getBoundingClientRect();
+        const footerRect = footer.getBoundingClientRect();
+
+        // desired gap between card bottom and footer top
+        const gap = 12;
+
+        // if card bottom would intersect footer, compute overlap and shift
+        const overlap = cardRect.bottom - (footerRect.top - gap);
+        if (overlap > 0) {
+          // Limit shift so we don't move the timeline off the top of viewport
+          const timelineRect = timeline.getBoundingClientRect();
+          const maxAllowed = Math.max(0, timelineRect.top - 12);
+          const shift = Math.min(overlap, timelineRect.height + 100);
+          timeline.style.transform = `translateY(-${shift}px)`;
+        } else {
+          clearShift();
+        }
+      }, 80);
+    }
+
+    // Reset on window resize (layout may change)
+    window.addEventListener('resize', clearShift);
+
+    // Attach pointer handlers to each card
+    const cards = document.querySelectorAll('.timeline-card');
+    cards.forEach(card => {
+      card.addEventListener('pointerenter', () => maybeShiftForCard(card));
+      card.addEventListener('pointerleave', () => clearShift());
+      card.addEventListener('focus', () => maybeShiftForCard(card));
+      card.addEventListener('blur', () => clearShift());
+    });
+  })();
     cards.forEach(card => {
       card.addEventListener('click', function() {
         // Check if this card is already active
