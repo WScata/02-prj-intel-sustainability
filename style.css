@@ -107,10 +107,12 @@ body {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, height 0.3s ease;
   display: flex;
   flex-direction: column;
   border-left: 5px solid #0071c5;
+  /* Desktop: Start with compact height */
+  height: fit-content;
 }
 
 /* Card Hover Effect */
@@ -166,7 +168,7 @@ body {
   text-align: center;
 }
 
-/* Card Description Text - Compact by default */
+/* Card Description Text - Compact by default on desktop */
 .card-description {
   padding: 20px 25px;
   font-size: 0.95em;
@@ -176,13 +178,34 @@ body {
   max-height: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
+  transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
 }
 
-/* Expand description on hover */
-.timeline-card:hover .card-description {
-  max-height: 300px;
-  opacity: 1;
+/* Expand description on hover (desktop only) */
+@media (min-width: 769px) {
+  .timeline-card:hover .card-description {
+    max-height: 300px;
+    opacity: 1;
+  }
+}
+
+/* Mobile version: tap to show description with expand/collapse */
+@media (max-width: 768px) {
+  /* Default state - description is hidden */
+  .card-description {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    padding: 0 25px;
+  }
+  
+  /* Active state - show description when card is tapped */
+  .timeline-card.active .card-description {
+    max-height: 300px;
+    opacity: 1;
+    padding: 20px 25px;
+  }
 }
 
 /* ===== Responsive Design ===== */

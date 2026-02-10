@@ -201,5 +201,25 @@
   <footer class=\"timeline-footer\">
     <p>Scroll to view timeline | Hover over cards to learn more!</p>
   </footer>
-</body>
+  <!-- JavaScript for Mobile Tap Functionality -->
+  <script>
+    // Get all timeline cards
+    const cards = document.querySelectorAll('.timeline-card');
+    
+    // Add click/tap event listener to each card
+    cards.forEach(card => {
+      card.addEventListener('click', function() {
+        // Check if this card is already active
+        const isActive = this.classList.contains('active');
+        
+        // Remove 'active' class from all cards
+        cards.forEach(c => c.classList.remove('active'));
+        
+        // If the clicked card wasn't active, add the 'active' class to it
+        if (!isActive) {
+          this.classList.add('active');
+        }
+      });
+    });
+  </script></body>
 </html>
